@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oos-be-deployment
+  namespace: "oos-prod"
+  labels:
+    app: oos-be
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: oos-be
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  minReadySeconds: 60        
+  template:
+    metadata:
+      labels:
+        app: oos-be
+    spec:
+      containers:
+      - name: oos-be
+        image: 297557287305.dkr.ecr.us-east-1.amazonaws.com/oos-be-prod:6f84643
+        imagePullPolicy: Always
+        env:
+        - name: NODE_ENV
+          value: "prod"
+        ports:
+        - containerPort: 3001

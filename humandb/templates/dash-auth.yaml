@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.dashApiImage.appName }}
+  namespace: {{ .Values.app.namespace }}
+  labels:
+    app: {{ .Values.dashApiImage.appName }}
+  annotations:
+   alb.ingress.kubernetes.io/healthcheck-path: /health
+spec:
+  ports:
+    - port: {{ .Values.app.network.nodeJsPort }}
+      protocol: TCP
+      targetPort: {{ .Values.app.network.nodeJsPort }}
+  selector:
+    app: {{ .Values.dashApiImage.appName }}
+  sessionAffinity: None
+  type: NodePort
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.dashApiImage.appName }}
+  namespace: {{ .Values.app.namespace }}
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  minReadySeconds: 60
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.dashApiImage.appName }}
+    spec:
+      containers:
+      - name: cdb-dash-auth
+        image: {{ .Values.dashApiImage.repository }}:{{ .Values.dashApiImage.tag }}
+        ports:
+        - containerPort: {{ .Values.app.network.nodeJsPort }}
+        imagePullPolicy: {{ .Values.dashApiImage.pullPolicy }}
+        env:
+          - name: NODE_ENV
+            value: "production"
+          - name: PORT
+            value: "3001"
+          - name: POSTGRES_HOST
+            value: pgsql-dash
+          - name: POSTGRES_PORT
+            value: "5432"
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: dash-dbsecret
+                key: dbUsername
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: dash-dbsecret
+                key: dbPassword
+          - name: POSTGRES_DB
+            value: dashboard
+          - name: DISCOURSE_HOSTNAME
+            value: {{ .Values.app.host }}
+          - name: DISCOURSE_SSO_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: dash-sso-secret
+                key: discourseSSOsecret
+          - name: DISCOURSE_ADMIN_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: chatapisecret
+                key: apiKey
+          - name: DISCOURSE_ADMIN_USERNAME
+            value: cancerdb
+          - name: GOOGLE_OAUTH_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: dash-google-oauth-secret
+                key: clientId
+          - name: GOOGLE_OAUTH_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: dash-google-oauth-secret
+                key: clientSecret
+          - name: GOOGLE_OAUTH_CALLBACK_URL
+            value: https://{{ .Values.app.host }}/auth/google/callback
+          - name: GOOGLE_OAUTH_SUCCESS_REDIRECT
+            value: https:///{{ .Values.app.host }}/token-login
+          - name: PRIMARY_EMAIL_ADDRESS
+            value: admin@hmycancerdb.com,jordan@denisonweb.com,apopp@mycancerdb.com
+          #- name: ADVAITABIO_API_USERNAME
+          #  valueFrom:
+          #    secretKeyRef:
+          #      name: dash-internal-api-creds-secret
+          #      key: advaitabioUsername
+          #- name: ADVAITABIO_API_PASSWORD
+          #  valueFrom:
+          #    secretKeyRef:
+          #      name: dash-internal-api-creds-secret
+          #      key: advaitabioPassword
+          - name: DISCOURSE_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: chatapisecret
+                key: apiKey
+      initContainers:
+      - name: init-pgsql-dash
+        image: busybox
+        command: ['sh', '-c', 'until nslookup pgsql-dash; do echo waiting for pgsql-dash; sleep 30; done;']

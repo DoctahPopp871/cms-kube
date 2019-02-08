@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hdb-adv-api
+  namespace: humandb-01
+  annotations:
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+  labels:
+    app: hdb-advaita-api
+spec:
+  ports:
+    - port: 5500
+  selector:
+    app: hdb-advaita-api
+  clusterIP: None
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hdb-adv-api
+  namespace: humandb-01
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: hdb-advaita-api
+    spec:
+      containers:
+        - name: hdb-advaita-api
+          image: 413230511243.dkr.ecr.us-east-1.amazonaws.com/hdb-advaita-api:db09106
+          ports:
+          - containerPort: 5500
+          volumeMounts:
+            - name: hdb01-advaita-data
+              mountPath: /advaita-results
+          env:
+            - name: HDB_HOST
+              value: hdb01.humandb.ai
+            - name: NODE_ENV
+              value: production
+            - name: ADVAITABIO_API_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: dash-internal-api-creds-secret
+                  key: advaitabioUsername
+            - name: ADVAITABIO_API_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dash-internal-api-creds-secret
+                  key: advaitabioPassword
+      volumes:
+      - name: hdb01-advaita-data
+        persistentVolumeClaim:
+          claimName: hdb01-advaita-pvc

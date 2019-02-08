@@ -1,0 +1,19 @@
+#Auth JWT Toke Auth
+-- postgres container (DONE)
+    -- data backend
+    -- feathers persistant user data MD
+
+-- Nginx Container FE(1) Compile Container (package.json script directive build outputs static specified dir)
+--- Compiled down REACT
+
+Routes
+/dashboard
+
+--- Node Container (BE)
+--- Express
+--- Google API Creds -- Andrew
+--- Domain/Callback
+
+
+Routes
+/auth/google/callback -- main callback from google.

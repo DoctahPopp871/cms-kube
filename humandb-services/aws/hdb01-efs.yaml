@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hdb01-efs-provisoner
+  namespace: humandb-01
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: efs-provisioner-hdb01
+  namespace: humandb-01
+data:
+  file.system.id: fs-6902bf23
+  aws.region: us-east-1
+  provisioner.name: hdb01/aws-efs
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: efs-provisioner-hdb01
+  namespace: humandb-01
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: efs-provisioner-hdb01
+    spec:
+      serviceAccount: hdb01-efs-provisoner
+      containers:
+        - name: efs-provisioner-hdb01
+          image: quay.io/external_storage/efs-provisioner:latest
+          env:
+            - name: FILE_SYSTEM_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: efs-provisioner-hdb01
+                  key: file.system.id
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: efs-provisioner-hdb01
+                  key: aws.region
+            - name: PROVISIONER_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: efs-provisioner-hdb01
+                  key: provisioner.name
+          volumeMounts:
+            - name: pv-volume
+              mountPath: /persistentvolumes
+      volumes:
+        - name: pv-volume
+          nfs:
+            server: fs-6902bf23.efs.us-east-1.amazonaws.com
+            path: /
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: aws-efs-hdb01
+  namespace: humandb-01
+provisioner: hdb01/aws-efs

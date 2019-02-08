@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cdb-dash-fe
+  namespace: {{ .Values.app.namespace }}
+  labels:
+    app: cdb-dash-fe
+spec:
+  ports:
+    - port: {{ .Values.app.network.webPort }}
+      protocol: TCP
+      targetPort: {{ .Values.app.network.webPort }}
+  selector:
+    app: cdb-dash-fe
+  sessionAffinity: None
+  type: NodePort
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cdb-dash-fe
+  namespace: {{ .Values.app.namespace }}
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  minReadySeconds: 60
+  template:
+    metadata:
+      labels:
+        app: cdb-dash-fe
+    spec:
+      containers:
+      - name: cdb-dash-fe
+        image: {{ .Values.dashFeImage.repository }}:{{ .Values.dashFeImage.tag }}
+        ports:
+        - containerPort: {{ .Values.app.network.webPort }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.app.network.webPort }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.app.network.webPort }}       
+        imagePullPolicy: Always
+        env:
+          - name: PORT
+            value: "{{ .Values.app.network.webPort }}"

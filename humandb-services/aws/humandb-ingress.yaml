@@ -1,0 +1,54 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: "hdb01-alb-ingress"
+  namespace: "humandb-01"
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/subnets: 'subnet-00a93427e26597f2c,subnet-0170db84466145aaf,subnet-0c35d9339389894a3,subnet-084b6a519280ac5e9'
+    alb.ingress.kubernetes.io/security-groups: sg-01bf2d03bf04dc337
+    alb.ingress.kubernetes.io/certificate-arn: 	arn:aws:acm:us-east-1:413230511243:certificate/725ad325-6d8a-4675-b427-cb2fc4912528
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80,"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/success-codes: '200,301,401'
+    alb.ingress.kubernetes.io/ignore-host-header: "true"
+    alb.ingress.kubernetes.io/target-group-attributes: 'stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=900'
+    kubernetes.io/ingress.class: "alb"
+  labels:
+    app: hdb01-alb-ingress
+spec:
+  backend:
+    serviceName: "hdb-dash-fe"
+    servicePort: 80
+  rules:
+  - host: hdb01.humandb.ai
+    http:
+      paths:
+      - path: /discussion/*
+        backend:
+          serviceName: "discourse-web"
+          servicePort: 80
+      - path: /discussion
+        backend:
+          serviceName: "discourse-web"
+          servicePort: 80
+      - path: /auth/*
+        backend:
+          serviceName: "hdb-dash-auth"
+          servicePort: 3001
+      - path: /auth
+        backend:
+          serviceName: "hdb-dash-auth"
+          servicePort: 3001
+      - path: /docs/*
+        backend:
+          serviceName: "hdb-dash-docs"
+          servicePort: 80
+      - path: /docs
+        backend:
+          serviceName: "hdb-dash-docs"
+          servicePort: 80
+      - path: /api/advaita/*
+        backend:
+          serviceName: "hdb-adv-api"
+          servicePort: 5500

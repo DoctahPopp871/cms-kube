@@ -1,0 +1,21 @@
+{
+  "name": "hdb-test-container",
+  "version": "1.0.0",
+  "description": "Container for testing",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node deps-check.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@feathersjs/authentication-client": "^1.0.2",
+    "@feathersjs/feathers": "^3.1.0",
+    "@feathersjs/socketio-client": "^1.0.2",
+    "bluebird": "^3.5.3",
+    "socket.io-client": "^2.0.4"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.6"
+  }
+}

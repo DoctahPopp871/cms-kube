@@ -1,0 +1,18 @@
+swap:
+  deployment:
+    name: cdb-dash-fe
+    image: hdb01/dv-dash-fe:08a2ed6
+    command:
+     - sh
+     - -c
+     - tail -f /dev/null
+mount:
+  source: .
+  target: /var/www
+scripts:
+    start: yarn run start
+    install: yarn install
+
+#Docs
+# https://github.com/okteto/cnd/blob/master/docs/cli-reference.md
+# https://github.com/okteto/cnd/blob/master/docs/yml-reference.md

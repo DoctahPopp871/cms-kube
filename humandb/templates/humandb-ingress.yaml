@@ -1,0 +1,48 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Values.app.ingress.name }}
+  namespace: {{ .Values.app.namespace }}
+  annotations:
+    kubernetes.io/ingress.class: {{ .Values.app.ingress.ingressClass }}
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+  labels:
+    app: {{ .Values.app.ingress.name }}
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.app.host }}
+    secretName: {{ .Values.app.ingress.sslSecretName }}
+  rules:
+  - host: {{ .Values.app.host }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: "cdb-dash-fe"
+          servicePort: 80
+      - path: /discussion/
+        backend:
+          serviceName: "discourse-web"
+          servicePort: 80
+      - path: /discussion
+        backend:
+          serviceName: "discourse-web"
+          servicePort: 80
+      - path: /auth/
+        backend:
+          serviceName: "cdb-dash-auth"
+          servicePort: 3001
+      - path: /auth
+        backend:
+          serviceName: "cdb-dash-auth"
+          servicePort: 3001
+      - path: /docs/
+        backend:
+          serviceName: "cdb-dash-docs"
+          servicePort: 80
+      - path: /docs
+        backend:
+          serviceName: "cdb-dash-docs"
+          servicePort: 80

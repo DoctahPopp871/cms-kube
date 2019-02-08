@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oos-fe-deployment
+  namespace: "oos-prod"
+  labels:
+    app: oos-fe
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: oos-fe
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  minReadySeconds: 60  
+  template:
+    metadata:
+      labels:
+        app: oos-fe
+    spec:
+      containers:
+      - name: oos-fe
+        image: 297557287305.dkr.ecr.us-east-1.amazonaws.com/oos-fe-prod:6f84643
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80

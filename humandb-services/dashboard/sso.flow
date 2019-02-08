@@ -1,0 +1,13 @@
+Prereqs
+
+Enable SSO in Discourse and input our Discourse SSO login API URL (/auth/discourse/sso for example)
+
+1. User goes to Discourse to login and is redirected to our Discourse SSO login API URL (/auth/discourse/sso for example)
+2. Our API endpoint validates the request using the payload + signature + SSO secret
+3. API endpoint creates temporary non-user specific "Discourse login" token, stores it in database paired with the original Discourse payload + signature, and redirects to our OAuth login page with the temp token as a querystring param
+4. Dashboard Login page parses temporary "Discourse login" token and saves it in localStorage
+5. User clicks "Log in with google" and is redirected to google
+6. User logs in with google and is redirected back to our dashboard/login site
+7. User gets token from our API and is now logged in to our Dashboard
+8. Dashboard checks localStorage for presence of "Discourse login" temporary token and makes request to API with it
+9. API fetches original Disource payload + signature from database with temp token and generates new payload, then redirects user to Discourse SSO login and is now logged into Discourse as well

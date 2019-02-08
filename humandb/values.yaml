@@ -1,0 +1,118 @@
+# Default values for humandb.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+##### Deployment Env #####
+# View the README.md for the relevant env #
+platform:
+  local: true
+  aws: false
+
+#secrets:
+
+##### App Settings #####
+app:
+  namespace: cdb
+  host: mycancerdb-local-development.com #humandb-local-development.com #mycancerdb-local-development
+  network:
+    psqlPort: 5432
+    webPort: 80
+    discourseMailPort: 25
+    redisPort: 6379
+    ubuntuWsPort: 80
+    nodeJsPort: 3001
+  ingress:
+    name: cdb01-alb-ingress
+    ingressClass: nginx
+    sslSecretName: mycancerdb-local-development
+
+
+##### Images ######
+ubuntuWsImage:
+  appName: ubuntu-ws
+  repository: hdb01/ubuntu-workspace
+  tag: latest
+  pullPolicy: Always
+
+redisImage:
+  appName: redis
+  repository: redis
+  tag: latest
+  pullPolicy: Always
+
+dashApiImage:
+  appName: cdb-dash-auth
+  repository: hdb01/dash-api
+  tag: latest
+  pullPolicy: Always
+
+dashDocsImage:
+  appName: cdb-dash-docs
+  repository: hdb01/dash-api
+  tag: latest
+  pullPolicy: Always
+
+discourseImage:
+  appName: discourse-web
+  repository: hdb01/discourse
+  tag: latest
+  pullPolicy: Always
+
+dispgsqlImage:
+  appName: pgsql-discourse
+  repository: postgres
+  tag: 9.5.8
+  pullPolicy: Always
+
+dashFeImage:
+  appName: cdb-dash-fe
+  repository: hdb01/pr-dash-fe
+  devRepository: hdb01/dv-dash-fe
+  devPort: 3000
+  tag: 08a2ed6
+  pullPolicy: Always
+
+##### Storage Settings #####
+
+storage:
+  awsController: aws-efs-hdb01
+  localController: hdb-nfs
+  localCode:
+    name: code
+    mountPath: /humandb
+  rawData:
+    name: data
+    mountPath: /resources
+    services: /resources/services
+
+##### Discourse Settings #####
+discourseSettings:
+  dbName: discourse
+  discourseHostname: mycancerdb-local-development.com  #humandb-local-development.com
+  discourseUrl: /discussion
+  ssoUrl: https://mycancerdb-local-development.com/auth/discourse/sso
+  ssoLogoutRedirect: https://mycancerdb-local-development.com/auth/discourse/sso/logout
+  developerEmails: admin@mycancerdb.com
+  smtp_endpoint: email-smtp.us-east-1.amazonaws.com
+
+#### Secret Values ####
+## Once you have applied this helm chart remove your secrets!!! ##
+
+secrets:
+    chatapisecret:
+      apiKey: ZDc1N2UxMTJhYjYyNGQ1MGY4YWQ0ZGRlOWIyZGY2N2YwOGI5OTgwZmVkZDc2MDhhOTFlZGFhZGQwODdjYzYxNA==
+    dbsecret:
+      dbUsername: ZGlzY291cnNl
+      dbPassword: aFVtNG5EQjAxIQ==
+    dashGoogleOauthSecret:
+      clientId: MTA1MTc0MjM1NTc1Ni1jdmNqbnAxY2lucG5xcW1uM3E1Mmk4dHYwZGptMGVkNC5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbQ==
+      clientSecret: Z09Zam1UVUZRNmNnY0lQVUJiT011VFJT
+    dashSsoSecret:
+      discourseSSOsecret: ZDQ2MmM4OTVhMWIxM2U1YTc2NGM2MmVhOWMzMWU2NDIzOTRlMTE1NzU1MjAxMGRmNTRiNzA1YTgwNjgzNzdiOTc0M2UxZmZmYWZlZDcyNWMwYTA1YmI1ZjY0YTBiMWQzNjYyM2Q1OWU4MzBjNjVhYWUz
+      discourseAdminUsername:
+    dashDbsecret:
+      dbUsername: aGRiLWRhc2g=
+      dbPassword: ZEAkaGIwNHJkITM0
+    sesEmailSecret:
+      sesUsername: QUtJQUpCUDRHMklIRzVOS1pJNUE=
+      sesPassword: QWtZa3lQQVpWRnlNMHhIRmVUcHVhVE1DN20zTW9VNG14SUZadlBVLzhGQTc=

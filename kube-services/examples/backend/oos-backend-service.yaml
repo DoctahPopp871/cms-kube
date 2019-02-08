@@ -1,0 +1,18 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: oos-be-service
+  namespace: "oos-prod"
+  annotations:
+    alb.ingress.kubernetes.io/healthcheck-path: /healthcheck
+  labels:
+    app: oos-be
+spec:
+  type: NodePort
+  selector:
+    app: oos-be
+  ports:
+  - port: 3001
+    targetPort: 3001
+    protocol: TCP
+    name: benode

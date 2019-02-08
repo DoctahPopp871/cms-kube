@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: adv-ivariantguide
+  namespace: "humandb-01"
+spec:
+  template:
+    spec:
+      containers:
+      - name: advaita-hdb01
+        image: 413230511243.dkr.ecr.us-east-1.amazonaws.com/advaitabio:latest
+        imagePullPolicy: Always
+        command: [ivg-client]
+        volumeMounts:
+        - name: hdbb01-raw-data
+          mountPath: /hdb01-data
+        - name: hdb01-advaita-data
+          mountPath: /advaita-results
+        env:
+          - name: INPUT_FILE_PATH
+            value: /hdb01-data/VCFs/GVCFs/normalWES.vcf.gz
+          - name: HTML_FILE_PATH
+            value: /advaita-results/test1.html
+          - name: TITLE
+            value: "This is a report on normalWES.vcf.gz"
+          - name: DESCRIPTION
+            value: "Report on tumor whole genmoe sequence"
+          - name: REPORT_TYPE
+            value: VARIANTS_SINGLE_SAMPLE
+          ## Report Types VARIANTS_SINGLE_SAMPLE, VARIANTS_GROUP_VS_GROUP, VARIANTS_PEDIGREE, VARIANTS_TUMOR_VS_NORMAL
+          - name: CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: advaita-api
+                key: apiID
+          - name: CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: advaita-api
+                key: apiSecret
+      restartPolicy: Never
+      volumes:
+      - name: hdbb01-raw-data
+        persistentVolumeClaim:
+          claimName: hdb01-raw-pvc
+      - name: hdb01-advaita-data
+        persistentVolumeClaim:
+          claimName: hdb01-advaita-pvc

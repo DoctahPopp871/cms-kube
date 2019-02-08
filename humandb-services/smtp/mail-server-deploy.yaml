@@ -1,0 +1,52 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: mailserver
+  namespace: humandb-01
+  labels:
+    app: mailserver
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mailserver
+    spec:
+      nodeSelector:
+        has/mail-server: 'true'
+      subdomain: mailserver
+      containers:
+        - name: mailserver
+          image: tvial/docker-mailserver:latest
+          ports:
+            - name: smtp
+              containerPort: 25
+            - name: smtp-auth
+              containerPort: 587
+            - name: imap-secure
+              containerPort: 993
+          env:
+            - name: ONE_DIR
+              value: '1'
+            #######
+            #######
+            #######
+            #######  
+          volumeMounts:
+            - name: config
+              mountPath: /tmp/docker-mailserver
+            - name: data
+              mountPath: /var/mail
+            - name: state
+              mountPath: /var/mail-state
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: hdb01-smtp-cfg-pvc
+        - name: data
+          persistentVolumeClaim:
+            claimName: hdb01-smtp-data-pvc
+        - name: state
+          persistentVolumeClaim:
+            claimName: hdb01-smtp-state-pvc

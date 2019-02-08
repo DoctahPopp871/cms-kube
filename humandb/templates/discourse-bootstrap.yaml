@@ -1,0 +1,18 @@
+apiVersion: v1
+data:
+  bootstrap.sh: |
+    #!/bin/bash
+
+    #Enter discourse docroot
+    pushd /var/www/discourse
+    #Stop unicorn webserver
+    sv stop unicorn
+    #Seed the database with rake task
+    bundle exec rake db:migrate
+    #Start unicorn webserver
+    sv start unicorn
+    popd
+kind: ConfigMap
+metadata:
+  name: discoursedb
+  namespace: {{ .Values.app.namespace }}

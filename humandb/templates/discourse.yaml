@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: discourse-web
+  namespace: {{ .Values.app.namespace }}
+  labels:
+    app: discourse-web
+spec:
+  ports:
+    - port: {{ .Values.app.network.webPort }}
+      protocol: TCP
+      targetPort: {{ .Values.app.network.webPort }}
+  selector:
+    app: discourse-web
+  sessionAffinity: None
+  type: NodePort
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: discourse-web
+  namespace: {{ .Values.app.namespace }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: discourse-web
+    spec:
+      containers:
+      - name: discourse-web
+        image: {{ .Values.discourseImage.repository }}:{{ .Values.discourseImage.tag }}
+        command: ["/sbin/boot"]
+        ports:
+        - containerPort: {{ .Values.app.network.webPort }}
+        - containerPort: {{ .Values.app.network.discourseMailPort }}
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "/root/bootstrap.sh"]
+        env:
+        - name: DISCOURSE_DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: dbsecret
+              key: dbUsername
+        - name: DISCOURSE_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: dbsecret
+              key: dbPassword
+        - name: DISCOURSE_DB_HOST
+          value: {{ .Values.dispgsqlImage.appName }}
+        - name: DISCOURSE_DB_NAME
+          value: {{ .Values.discourseSettings.dbName }}
+        - name: DISCOURSE_REDIS_HOST
+          value: {{ .Values.redisImage.appName }}
+        - name: DISCOURSE_DEVELOPER_EMAILS
+          value: {{ .Values.discourseSettings.developerEmails }}
+        - name: DISCOURSE_HOSTNAME
+          value: {{ .Values.discourseSettings.discourseHostname }}
+        - name: DISCOURSE_RELATIVE_URL_ROOT
+          value: {{ .Values.discourseSettings.discourseUrl }}
+        - name: ENABLE_SSO
+          value: "true"
+        - name: SSO_URL
+          value: {{ .Values.discourseSettings.ssoUrl }}
+        - name: SSO_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: dash-sso-secret
+              key: discourseSSOsecret
+        - name: SSO_OVERIDES_EMAIL
+          value: "true"
+        - name: LOGOUT_REDIRECT
+          value: {{ .Values.discourseSettings.ssoLogoutRedirect }}
+        - name: DISCOURSE_SMTP_ADDRESS
+          value: {{ .Values.discourseSettings.smtp_endpoint }}
+        - name: DISCOURSE_SMTP_PORT
+          value: "{{ .Values.app.network.discourseMailPort }}"
+        - name: DISCOURSE_SMTP_USER_NAME
+          valueFrom:
+            secretKeyRef:
+              name: chat-smtp-secret
+              key: sesUsername
+        - name: DISCOURSE_SMTP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: chat-smtp-secret
+              key: sesPassword
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 1
+            memory: 2Gi
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: discourse
+          mountPath: /var/www/discourse/config/site_settings.yml
+          subPath: site_settings.yml
+        - name: resources
+          mountPath: /shared
+        - name: discoursedb
+          mountPath: /root/bootstrap.sh
+          subPath: bootstrap.sh
+      initContainers:
+      - name: init-pgsql
+        image: busybox
+        command: ['sh', '-c', 'until nslookup pgsql; do echo waiting for pgsql; sleep 30; done;']
+      volumes:
+        - name: discourse
+          configMap:
+            defaultMode: 0777
+            name: discourse-settings
+        - name: discoursedb
+          configMap:
+            defaultMode: 0777
+            name: discoursedb
+        - name: resources
+          flexVolume:
+            driver: ceph.rook.io/rook
+            fsType: ceph
+            options:
+              fsName: myfs # name of the filesystem specified in the filesystem CRD.
+              clusterNamespace: rook-ceph # namespace where the Rook cluster is deployed
+              # by default the path is /, but you can override and mount a specific path of the filesystem by using the path attribute
+              # the path must exist on the filesystem, otherwise mounting the filesystem at that path will fail
+              path: /services/discourse/shared

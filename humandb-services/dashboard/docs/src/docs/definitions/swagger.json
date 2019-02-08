@@ -1,0 +1,182 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is documentation is for the auth dashboard API endpoint.",
+    "version": "1.0.0",
+    "title": "HumanDB Auth Dashboard API",
+    "termsOfService": "http://humandb.ai/terms/",
+    "contact": {
+      "email": "admin@humandb.ai"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "humandb.ai",
+  "basePath": "/auth",
+  "tags": [
+    {
+      "name": "status",
+      "description": "",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://humandb.ai"
+      }
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/status": {
+      "post": {
+        "tags": [
+          "status"
+        ],
+        "summary": "Add a new service status",
+        "description": "The purpose of this endpoint is to notify end-users of connected container statuses by dependency of that container",
+        "operationId": "addStatus",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/xml",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Status object that needs to be added",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
+          },
+          "405": {
+            "description": "Invalid input"
+          }
+        },
+        "security": [
+          {
+            "dashboard_auth": [
+              "write:status"
+            ]
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "status"
+        ],
+        "summary": "Update an existing status",
+        "description": "",
+        "operationId": "patchStatus",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/xml",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Status object to be edited",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Status not found"
+          },
+          "405": {
+            "description": "Validation exception"
+          }
+        },
+        "security": [
+          {
+            "dashboard_auth": [
+              "write:status"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "securityDefinitions": {
+    "dashboard_auth": {
+      "type": "oauth2",
+      "authorizationUrl": "https://hdb01.humandb.ai/login",
+      "flow": "implicit",
+      "scopes": {
+        "write:status": "modify service status"
+      }
+    },
+    "api_key": {
+      "type": "apiKey",
+      "name": "api_key",
+      "in": "header"
+    }
+  },
+  "definitions": {
+    "Status": {
+      "type": "object",
+      "required": [
+        "service",
+        "dependency"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuidv4"
+        },
+        "service": {
+          "type": "string",
+          "example": "Advaita"
+        },
+        "dependency": {
+          "type": "string",
+          "example": "VCF data files"
+        },
+        "description": {
+          "type": "string",
+          "example": "These files are required for proper genome analysis."
+        },
+        "status": {
+          "type": "string",
+          "example": "available / unavailable",
+          "enum": [
+            "available",
+            "unavailable"
+          ]
+        }
+      },
+      "xml": {
+        "name": "Status"
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  }
+}

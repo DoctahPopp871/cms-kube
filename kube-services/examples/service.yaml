@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "humandb.fullname" . }}
+  labels:
+    app: {{ include "humandb.name" . }}
+    chart: {{ include "humandb.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ include "humandb.name" . }}
+    release: {{ .Release.Name }}

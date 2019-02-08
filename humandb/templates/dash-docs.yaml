@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cdb-dash-docs
+  namespace: {{ .Values.app.namespace }}
+  labels:
+    app: cdb-dash-docs
+spec:
+  ports:
+    - port: {{ .Values.app.network.webPort }}
+      protocol: TCP
+      targetPort: {{ .Values.app.network.webPort }}
+  selector:
+    app: cdb-dash-docs
+  sessionAffinity: None
+  type: NodePort
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cdb-dash-docs
+  namespace: {{ .Values.app.namespace }}
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  minReadySeconds: 60
+  template:
+    metadata:
+      labels:
+        app: cdb-dash-docs
+    spec:
+      containers:
+      - name: cdb-dash-docs
+        image: {{ .Values.dashDocsImage.repository }}:{{ .Values.dashDocsImage.tag }}
+        ports:
+        - containerPort: {{ .Values.app.network.webPort }}
+        imagePullPolicy: Always

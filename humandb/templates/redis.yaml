@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.redisImage.appName }}
+  namespace: {{ .Values.app.namespace }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.redisImage.appName }}
+    spec:
+      containers:
+      - name: master
+        image: {{ .Values.redisImage.repository }}:{{ .Values.redisImage.tag }}
+        imagePullPolicy: {{ .Values.redisImage.pullPolicy }}
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: {{ .Values.app.network.redisPort }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.redisImage.appName }}
+  namespace: {{ .Values.app.namespace }}
+  labels:
+    app: {{ .Values.redisImage.appName }}
+spec:
+  ports:
+  - port: {{ .Values.app.network.redisPort }}
+    targetPort: {{ .Values.app.network.redisPort }}
+  selector:
+    app: {{ .Values.redisImage.appName }}
+  clusterIP: None
