@@ -1,0 +1,159 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2019-02-25T04:16:41Z"
+  generation: 1
+  labels:
+    app: discourse-web
+  name: discourse-web
+  namespace: cdb
+  resourceVersion: "44112876"
+  selfLink: /apis/extensions/v1beta1/namespaces/cdb/deployments/discourse-web
+  uid: 2772d1a5-38b4-11e9-991c-02a9fa4ecf54
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: discourse-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: discourse-web
+    spec:
+      containers:
+      - command:
+        - /sbin/boot
+        env:
+        - name: DISCOURSE_DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: dbUsername
+              name: dbsecret
+        - name: DISCOURSE_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: dbPassword
+              name: dbsecret
+        - name: DISCOURSE_DB_HOST
+          value: pgsql-discourse
+        - name: DISCOURSE_DB_NAME
+          value: discourse
+        - name: DISCOURSE_REDIS_HOST
+          value: redis
+        - name: DISCOURSE_DEVELOPER_EMAILS
+          value: admin@mycancerdb.com
+        - name: DISCOURSE_HOSTNAME
+          value: demo.mycancerdb.com
+        - name: DISCOURSE_RELATIVE_URL_ROOT
+          value: /discussion
+        - name: ENABLE_SSO
+          value: "true"
+        - name: SSO_URL
+          value: https://demo.mycancerdb.com/auth/discourse/sso
+        - name: SSO_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: discourseSSOsecret
+              name: dash-sso-secret
+        - name: SSO_OVERIDES_EMAIL
+          value: "true"
+        - name: LOGOUT_REDIRECT
+          value: https://demo.mycancerdb.com/auth/discourse/sso/logout
+        - name: DISCOURSE_SMTP_ADDRESS
+          value: email-smtp.us-east-1.amazonaws.com
+        - name: DISCOURSE_SMTP_PORT
+          value: "25"
+        - name: DISCOURSE_SMTP_USER_NAME
+          valueFrom:
+            secretKeyRef:
+              key: sesUsername
+              name: chat-smtp-secret
+        - name: DISCOURSE_SMTP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: sesPassword
+              name: chat-smtp-secret
+        image: hdb01/discourse:latest
+        imagePullPolicy: Always
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - /root/bootstrap.sh
+        name: discourse-web
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        - containerPort: 25
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/discourse/config/site_settings.yml
+          name: discourse
+          subPath: site_settings.yml
+        - mountPath: /shared
+          name: resources
+        - mountPath: /root/bootstrap.sh
+          name: discoursedb
+          subPath: bootstrap.sh
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 511
+          name: discourse-settings
+        name: discourse
+      - configMap:
+          defaultMode: 511
+          name: discoursedb
+        name: discoursedb
+      - flexVolume:
+          driver: ceph.rook.io/rook
+          fsType: ceph
+          options:
+            clusterNamespace: rook-ceph
+            fsName: myfs
+            path: /services/discourse/shared
+        name: resources
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2019-02-25T04:16:41Z"
+    lastUpdateTime: "2019-02-25T04:16:41Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2019-02-25T04:16:41Z"
+    lastUpdateTime: "2019-02-25T04:21:21Z"
+    message: ReplicaSet "discourse-web-87f9c8cf7" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

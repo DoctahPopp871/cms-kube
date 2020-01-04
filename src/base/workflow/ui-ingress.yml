@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: "argo-ui-ingress"
+  namespace: "argo"
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/subnets: 'subnet-0bd5222c6a173e05f, subnet-0f990e9ec2d81d775, subnet-013d8310ba3087f44'
+    alb.ingress.kubernetes.io/security-groups: sg-0d337436be21c26ef
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:095537403280:certificate/8e6d92d1-2185-4214-906b-ab47249a2daf
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/success-codes: '200,301,401'
+    alb.ingress.kubernetes.io/ignore-host-header: "true"
+    alb.ingress.kubernetes.io/target-group-attributes: 'stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=900'
+    kubernetes.io/ingress.class: "alb"
+  labels:
+    app: argo-ui-ingress
+spec:
+  rules:
+  - host: workflow.cancerdb.io
+    http:
+      paths:
+      - path: /*
+        backend:
+          serviceName: "argo-ui"
+          servicePort: 80

@@ -1,0 +1,72 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "7"
+    kubernetes.io/change-cause: kubectl set image deployment/cdb-dash-fe cdb-dash-fe=413230511243.dkr.ecr.us-east-1.amazonaws.com/hdb-dash-fe:c15b10e
+      --namespace=cdb --record=true
+  creationTimestamp: "2019-02-25T04:16:41Z"
+  generation: 7
+  labels:
+    app: cdb-dash-fe
+  name: cdb-dash-fe
+  namespace: cdb
+  resourceVersion: "72028268"
+  selfLink: /apis/extensions/v1beta1/namespaces/cdb/deployments/cdb-dash-fe
+  uid: 2770a97a-38b4-11e9-991c-02a9fa4ecf54
+spec:
+  minReadySeconds: 60
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: cdb-dash-fe
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: cdb-dash-fe
+    spec:
+      containers:
+      - env:
+        - name: PORT
+          value: "80"
+        image: 413230511243.dkr.ecr.us-east-1.amazonaws.com/hdb-dash-fe:c15b10e
+        imagePullPolicy: Always
+        name: cdb-dash-fe
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2019-02-25T04:16:41Z"
+    lastUpdateTime: "2019-02-25T04:16:41Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2019-02-25T04:16:41Z"
+    lastUpdateTime: "2019-12-04T01:23:46Z"
+    message: ReplicaSet "cdb-dash-fe-86b5d6bdf9" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 7
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

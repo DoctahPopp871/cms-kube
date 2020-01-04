@@ -1,12 +1,3 @@
-# ![HumanDB logo](content/18F-HumanDB-LogoR1-02.svg) HumanDB -- Data Infrastructure and Services for Patients.
-
-[**Visit the website.**](https://humandb.ai)<br>
-[**Discuss and ask questions on the HumanDB Slack Channel.**](https://humandbworkspace.slack.com)<br>
-
-*HumanDB* is a
-
-To start working with *HumanDB*, check out the [Local Deployment Guide](https://) and the other [wiki pages](https://wiki). Join our Slack channel [Slack Channel](https://) and start collaborating with us.
-
 ### Table of Contents
 **[Requirements](#requirements)**<br>
 **[Deployment Instructions](#installation-instructions)**<br>
@@ -132,13 +123,6 @@ Feel free to create a feature request issue if what you want isn't already there
 
 It also takes a fair bit of work to stay up-to-date with the latest changes in all the applications and web sites where Markdown Here works.
 
-## Credits
-
-*HumanDB* is an open source project started by the following initial contributors
-
-* Andy Singleton
-* Andrew Popp
-* Jordan Denison
 
 ## Feedback
 
@@ -149,7 +133,3 @@ All bugs, feature requests, pull requests, feedback, etc., are welcome. [Create 
 ### Code
 
 MIT License: https://opensource.org/licenses/MIT or see [the `LICENSE` file](https://).
-
-### Logo
-
-Copyright 2018, [Corey Rondeau](http://coreyrondeau.com)
