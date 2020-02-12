@@ -48,7 +48,7 @@ spec:
           - name: PORT
             value: {{ .Values.app.network.nodeJsPort }}
           - name: POSTGRES_HOST
-            value: {{ .Values.dashapiImage.dbHost }}
+            value: {{ .Values.dashApiImage.dbHost }}
           - name: POSTGRES_PORT
             value: {{ .Values.app.network.psqlPort }}
           - name: POSTGRES_USER
@@ -62,7 +62,7 @@ spec:
                 name: auth-dbsecret
                 key: dbPassword
           - name: POSTGRES_DB
-            value: {{ .Values.dashapiImage.dbName }}
+            value: {{ .Values.dashApiImage.dbName }}
           - name: DISCOURSE_HOSTNAME
             value: {{ .Values.app.host }}
           - name: DISCOURSE_SSO_SECRET
