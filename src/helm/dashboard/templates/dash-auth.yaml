@@ -37,7 +37,7 @@ spec:
         app: {{ .Values.dashApiImage.appName }}
     spec:
       containers:
-      - name: cdb-dash-auth
+      - name: {{ .Values.dashApiImage.appName }}
         image: {{ .Values.dashApiImage.repository }}:{{ .Values.dashApiImage.tag }}
         ports:
         - containerPort: {{ .Values.app.network.nodeJsPort }}
@@ -46,23 +46,23 @@ spec:
           - name: NODE_ENV
             value: "production"
           - name: PORT
-            value: "3001"
+            value: {{ .Values.app.network.nodeJsPort }}
           - name: POSTGRES_HOST
-            value: pgsql-dash
+            value: {{ .Values.dashapiImage.dbHost }}
           - name: POSTGRES_PORT
-            value: "5432"
+            value: {{ .Values.app.network.psqlPort }}
           - name: POSTGRES_USER
             valueFrom:
               secretKeyRef:
-                name: dash-dbsecret
+                name: auth-dbsecret
                 key: dbUsername
           - name: POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: dash-dbsecret
+                name: auth-dbsecret
                 key: dbPassword
           - name: POSTGRES_DB
-            value: dashboard
+            value: {{ .Values.dashapiImage.dbName }}
           - name: DISCOURSE_HOSTNAME
             value: {{ .Values.app.host }}
           - name: DISCOURSE_SSO_SECRET
@@ -76,7 +76,10 @@ spec:
                 name: chatapisecret
                 key: apiKey
           - name: DISCOURSE_ADMIN_USERNAME
-            value: cancerdb
+            valueFrom:
+              secretKeyRef:
+                name: dash-sso-secret
+                key: discourseAdminUsername
           - name: GOOGLE_OAUTH_CLIENT_ID
             valueFrom:
               secretKeyRef:
@@ -91,8 +94,10 @@ spec:
             value: https://{{ .Values.app.host }}/auth/google/callback
           - name: GOOGLE_OAUTH_SUCCESS_REDIRECT
             value: https:///{{ .Values.app.host }}/token-login
+          - name: APPHOSTNAME
+            value: https://{{ .Values.app.host }}
           - name: PRIMARY_EMAIL_ADDRESS
-            value: admin@hmycancerdb.com,jordan@denisonweb.com,apopp@mycancerdb.com
+            value: {{ .Values.app.adminEmails.email1 }},{{ .Values.app.adminEmails.email2 }}
           #- name: ADVAITABIO_API_USERNAME
           #  valueFrom:
           #    secretKeyRef:
@@ -108,7 +113,7 @@ spec:
               secretKeyRef:
                 name: chatapisecret
                 key: apiKey
-      initContainers:
-      - name: init-pgsql-dash
-        image: busybox
-        command: ['sh', '-c', 'until nslookup pgsql-dash; do echo waiting for pgsql-dash; sleep 30; done;']
+      #initContainers:
+      #- name: init-pgsql-dash
+      #  image: busybox
+      #  command: ['sh', '-c', 'until nslookup pgsql-dash; do echo waiting for pgsql-dash; sleep 30; done;']

@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.dashVaultAppImage.appName }}
+  namespace: {{ .Values.app.namespace }}
+  labels:
+    app: {{ .Values.dashVaultAppImage.appName }}
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: {{ .Values.dashVaultAppImage.appName }}
+  sessionAffinity: None
+  type: NodePort
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.dashVaultAppImage.appName }}
+  namespace: {{ .Values.app.namespace }}
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  minReadySeconds: 60
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.dashVaultAppImage.appName }}
+    spec:
+      containers:
+      - name: {{ .Values.dashVaultAppImage.appName }}
+        image: {{ .Values.dashVaultAppImage.repository}}:{{ .Values.dashVaultAppImage.tag}}
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+        imagePullPolicy: {{ .Values.dashVaultAppImage.pullPolicy }}
+        env:
+          - name: PORT
+            value: "80"

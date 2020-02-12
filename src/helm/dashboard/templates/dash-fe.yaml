@@ -1,17 +1,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cdb-dash-fe
+  name: {{ .Values.dashFeImage.appName }}
   namespace: {{ .Values.app.namespace }}
   labels:
-    app: cdb-dash-fe
+    app: {{ .Values.dashFeImage.appName }}
 spec:
   ports:
     - port: {{ .Values.app.network.webPort }}
       protocol: TCP
       targetPort: {{ .Values.app.network.webPort }}
   selector:
-    app: cdb-dash-fe
+    app: {{ .Values.dashFeImage.appName }}
   sessionAffinity: None
   type: NodePort
 ---
@@ -19,7 +19,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: cdb-dash-fe
+  name: {{ .Values.dashFeImage.appName }}
   namespace: {{ .Values.app.namespace }}
 spec:
   replicas: 1
@@ -32,10 +32,10 @@ spec:
   template:
     metadata:
       labels:
-        app: cdb-dash-fe
+        app: {{ .Values.dashFeImage.appName }}
     spec:
       containers:
-      - name: cdb-dash-fe
+      - name: {{ .Values.dashFeImage.appName }}
         image: {{ .Values.dashFeImage.repository }}:{{ .Values.dashFeImage.tag }}
         ports:
         - containerPort: {{ .Values.app.network.webPort }}
@@ -46,7 +46,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /
-            port: {{ .Values.app.network.webPort }}       
+            port: {{ .Values.app.network.webPort }}
         imagePullPolicy: Always
         env:
           - name: PORT

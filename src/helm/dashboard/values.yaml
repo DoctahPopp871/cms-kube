@@ -13,18 +13,26 @@ platform:
 ##### App Settings #####
 app:
   namespace: cdb
-  host: mycancerdb-local-development.com #humandb-local-development.com #mycancerdb-local-development
+  host: mycancerdb.com
+  clusterName: mcdb-demo-000
   network:
+    vpcId:
+    awsRegion: us-east-2
     psqlPort: 5432
     webPort: 80
     discourseMailPort: 25
     redisPort: 6379
     ubuntuWsPort: 80
     nodeJsPort: 3001
+    albSecurityGroup:
+    subnets:
+      pubsub1:
+      pubsub2:
+      pubsub3:
   ingress:
     name: cdb01-alb-ingress
-    ingressClass: nginx
-    sslSecretName: mycancerdb-local-development
+    ingressClass: alb
+    sslCertArn:
 
 
 ##### Images ######
