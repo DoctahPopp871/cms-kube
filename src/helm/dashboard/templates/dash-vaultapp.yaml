@@ -7,9 +7,9 @@ metadata:
     app: {{ .Values.dashVaultAppImage.appName }}
 spec:
   ports:
-    - port: 80
+    - port: {{ .Values.app.network.webPort }}
       protocol: TCP
-      targetPort: 80
+      targetPort: {{ .Values.app.network.webPort }}
   selector:
     app: {{ .Values.dashVaultAppImage.appName }}
   sessionAffinity: None
@@ -34,6 +34,8 @@ spec:
       labels:
         app: {{ .Values.dashVaultAppImage.appName }}
     spec:
+      imagePullSecrets:
+      - name: {{ .Values.secrets.mcdbHarborSecrets.mcdbCoreapps.credName }}
       containers:
       - name: {{ .Values.dashVaultAppImage.appName }}
         image: {{ .Values.dashVaultAppImage.repository}}:{{ .Values.dashVaultAppImage.tag}}
@@ -42,11 +44,11 @@ spec:
         livenessProbe:
           httpGet:
             path: /
-            port: 80
+            port: {{ .Values.app.network.webPort }}
         readinessProbe:
           httpGet:
             path: /
-            port: 80
+            port: {{ .Values.app.network.webPort }}
         imagePullPolicy: {{ .Values.dashVaultAppImage.pullPolicy }}
         env:
           - name: PORT

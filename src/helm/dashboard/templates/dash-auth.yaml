@@ -36,6 +36,8 @@ spec:
       labels:
         app: {{ .Values.dashApiImage.appName }}
     spec:
+      imagePullSecrets:
+      - name: {{ .Values.secrets.mcdbHarborSecrets.mcdbCoreapps.credName }}
       containers:
       - name: {{ .Values.dashApiImage.appName }}
         image: {{ .Values.dashApiImage.repository }}:{{ .Values.dashApiImage.tag }}
@@ -46,11 +48,11 @@ spec:
           - name: NODE_ENV
             value: "production"
           - name: PORT
-            value: {{ .Values.app.network.nodeJsPort }}
+            value: "{{ .Values.app.network.nodeJsPort }}"
           - name: POSTGRES_HOST
             value: {{ .Values.dashApiImage.dbHost }}
           - name: POSTGRES_PORT
-            value: {{ .Values.app.network.psqlPort }}
+            value: "{{ .Values.app.network.psqlPort }}"
           - name: POSTGRES_USER
             valueFrom:
               secretKeyRef:
@@ -97,7 +99,7 @@ spec:
           - name: APPHOSTNAME
             value: https://{{ .Values.app.host }}
           - name: PRIMARY_EMAIL_ADDRESS
-            value: {{ .Values.app.adminEmails.email1 }},{{ .Values.app.adminEmails.email2 }}
+            value: {{ .Values.app.adminEmails.email2 }}
           #- name: ADVAITABIO_API_USERNAME
           #  valueFrom:
           #    secretKeyRef:

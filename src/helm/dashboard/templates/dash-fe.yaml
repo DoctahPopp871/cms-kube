@@ -34,9 +34,12 @@ spec:
       labels:
         app: {{ .Values.dashFeImage.appName }}
     spec:
+      imagePullSecrets:
+      - name: {{ .Values.secrets.mcdbHarborSecrets.mcdbCoreapps.credName }}
       containers:
       - name: {{ .Values.dashFeImage.appName }}
         image: {{ .Values.dashFeImage.repository }}:{{ .Values.dashFeImage.tag }}
+        imagePullPolicy: Always
         ports:
         - containerPort: {{ .Values.app.network.webPort }}
         livenessProbe:
@@ -47,7 +50,6 @@ spec:
           httpGet:
             path: /
             port: {{ .Values.app.network.webPort }}
-        imagePullPolicy: Always
         env:
           - name: PORT
             value: "{{ .Values.app.network.webPort }}"

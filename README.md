@@ -49,9 +49,9 @@ Local Development is a flexible process that leverages telepresence and kubernet
 minikube start --vm-driver=virtualbox
 minikube mount /path/to/code:/humandb &>/dev/null & 2&>> pid.txt
 minikube addons enable ingress
-kubectl apply -f kube-services/helm/tiller-rbac.yaml
+kubectl apply -f helm/tiller-rbac.yaml
 helm init --service-account tiller
-helm install humandb
+bash ./install-dash.sh
 
 ##Re-Arch Directions
 #Provision Cluster w. Tiller(Helm) & Ingress

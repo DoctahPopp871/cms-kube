@@ -28,6 +28,8 @@ spec:
       labels:
         app: {{ .Values.discourseImage.appName }}
     spec:
+      imagePullSecrets:
+      - name: {{ .Values.secrets.mcdbHarborSecrets.mcdbCoreapps.credName }}
       containers:
       - name: {{ .Values.discourseImage.appName }}
         image: {{ .Values.discourseImage.repository }}:{{ .Values.discourseImage.tag }}
@@ -100,9 +102,10 @@ spec:
         volumeMounts:
         - name: resources
           mountPath: /shared
-        - name: resources
-          hostPath:
-            # directory location on host
-            path: /data
-            # this field is optional
-            type: Directory
+      volumes:
+      - name: resources
+        hostPath:
+          # directory location on host
+          path: /data/discussion
+          # this field is optional
+          type: Directory
