@@ -5,6 +5,14 @@ metadata:
   namespace: {{ .Values.app.namespace }}
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.redisImage.appName }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -13,6 +21,7 @@ spec:
       containers:
       - name: master
         image: {{ .Values.redisImage.repository }}:{{ .Values.redisImage.tag }}
+        command: ["redis-server","--protected-mode no"]
         imagePullPolicy: {{ .Values.redisImage.pullPolicy }}
         resources:
           requests:
@@ -20,6 +29,7 @@ spec:
             memory: 100Mi
         ports:
         - containerPort: {{ .Values.app.network.redisPort }}
+          protocol: TCP
 ---
 apiVersion: v1
 kind: Service

@@ -211,8 +211,7 @@ metadata:
     alb.ingress.kubernetes.io/success-codes: '200,301,401'
     alb.ingress.kubernetes.io/ignore-host-header: "true"
     alb.ingress.kubernetes.io/target-group-attributes: 'stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=900'
-    alb.ingress.kubernetes.io/actions.redirect-to-eks: >
-      {"Type":"redirect","RedirectConfig":{"Host":"{{ .Values.app.host }}","Path":"/eks/","Port":"443","Protocol":"HTTPS","Query":"k=v","StatusCode":"HTTP_302"}}
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
     external-dns.alpha.kubernetes.io/hostname: {{ .Values.app.host }} # give your domain name here
   labels:
     app: {{ .Values.app.ingress.name }}
@@ -224,6 +223,10 @@ spec:
   - host: {{ .Values.app.host }}
     http:
       paths:
+      - path: /*
+        backend:
+          serviceName: ssl-redirect
+          servicePort: use-annotation
       - path: /auth/*
         backend:
           serviceName: "cdb-dash-auth"
