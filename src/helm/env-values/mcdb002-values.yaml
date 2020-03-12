@@ -13,13 +13,13 @@ platform:
 ##### App Settings #####
 app:
   namespace: cdb
-  host: demo.mycancerdb.com
-  clusterName: mcdb-demo-000
+  host: jmatthiessen.mycancerdb.com
+  clusterName: mcdb-fndr-002
   adminEmails:
     email1: admin@mycancerdb.com
     email2: apopp@mycancerdb.com
   network:
-    vpcId: vpc-0a3f15eaed750b395
+    vpcId: vpc-00134149a0eac9d46
     awsRegion: us-east-2
     psqlPort: 5432
     webPort: 80
@@ -27,13 +27,13 @@ app:
     redisPort: 6379
     ubuntuWsPort: 80
     nodeJsPort: 3001
-    albSecurityGroup: sg-0f6930d4befe51f8c
+    albSecurityGroup: sg-0791331732054a430
     subnets:
-      pubsub1: subnet-095f08770e8a102c9
-      pubsub2: subnet-0bae1560a5eaba049
-      pubsub3: subnet-096e84d48ac081ba6
+      pubsub1: subnet-02f52d2a855fc9d74
+      pubsub2: subnet-032efd780ce35abde
+      pubsub3: subnet-037d34d479c984530
   ingress:
-    name: cdb01-alb-ingress
+    name: mcdb002-alb-ingress
     ingressClass: alb
     sslCertArn: arn:aws:acm:us-east-2:095537403280:certificate/4470038f-8e38-4d6f-bcf8-94ae67aa0268
 
@@ -49,15 +49,15 @@ redisImage:
 dashApiImage:
   appName: cdb-dash-auth
   dbName: users
-  dbHost: mcdb-demo-db.cepbywupmriv.us-east-2.rds.amazonaws.com
+  dbHost: mcdb-fndr-002-db.cepbywupmriv.us-east-2.rds.amazonaws.com
   repository: docker.cancerdb.io/mcdb-coreapps/hdb-dash-auth
-  tag: 3d49149
+  tag: mcdb002
   pullPolicy: Always
 
 dashVaultAppImage:
   appName: cdb-vault-app
   repository: docker.cancerdb.io/mcdb-coreapps/mcdb-vault-app
-  tag: 8c68366
+  tag: mcdb002
   pullPolicy: Always
 
 discourseImage:
@@ -69,7 +69,7 @@ discourseImage:
 dashFeImage:
   appName: cdb-dash-fe
   repository: docker.cancerdb.io/mcdb-coreapps/hdb-dash-fe
-  tag: 080b795
+  tag: mcdb002
   pullPolicy: Always
 
 #ubuntuWsImage:
@@ -106,10 +106,10 @@ storage:
 ##### Discourse Settings #####
 discourseSettings:
   dbName: discussion
-  discourseHostname: demo.mycancerdb.com
+  discourseHostname: jmatthiessen.mycancerdb.com
   discourseUrl: /discussion
-  ssoUrl: https://demo.mycancerdb.com/auth/discourse/sso
-  ssoLogoutRedirect: https://demo.mycancerdb.com/auth/discourse/sso/logout
+  ssoUrl: https://jmatthiessen.mycancerdb.com/auth/discourse/sso
+  ssoLogoutRedirect: https://jmatthiessen.mycancerdb.com/auth/discourse/sso/logout
   developerEmails:
     email1: admin@mycancerdb.com
     email2: apopp@mycancerdb.com
@@ -131,8 +131,8 @@ secrets:
       discourseSSOsecret: ZDQ2MmM4OTVhMWIxM2U1YTc2NGM2MmVhOWMzMWU2NDIzOTRlMTE1NzU1MjAxMGRmNTRiNzA1YTgwNjgzNzdiOTc0M2UxZmZmYWZlZDcyNWMwYTA1YmI1ZjY0YTBiMWQzNjYyM2Q1OWU4MzBjNjVhYWUz
       discourseAdminUsername: TXlDYW5jZXJEQg==
     authDbsecret:
-      dbUsername: bWNkYmRlbW8=
-      dbPassword: WFpUOTJoR29MNg==
+      dbUsername: bWNkYjAwMg==
+      dbPassword: YXN3REcyM2hpd0xY
     sesEmailSecret:
       sesUsername: QUtJQVJNUFRaQ1dJTkNXR1JCVlI=
       sesPassword: Qk44a09QMHZ0TVpMd2k0Wms1aENISGRZYWJyT1ZLNU1yZTJtN3NVTlFrSHU=
