@@ -4,16 +4,18 @@ metadata:
   name: "argo-ui-ingress"
   namespace: "argo"
   annotations:
+    kubernetes.io/ingress.class: "alb"
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/subnets: 'subnet-0bd5222c6a173e05f, subnet-0f990e9ec2d81d775, subnet-013d8310ba3087f44'
     alb.ingress.kubernetes.io/security-groups: sg-0d337436be21c26ef
     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:095537403280:certificate/8e6d92d1-2185-4214-906b-ab47249a2daf
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80,"HTTPS": 443}]'
     alb.ingress.kubernetes.io/success-codes: '200,301,401'
     alb.ingress.kubernetes.io/ignore-host-header: "true"
     alb.ingress.kubernetes.io/target-group-attributes: 'stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=900'
-    kubernetes.io/ingress.class: "alb"
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    external-dns.alpha.kubernetes.io/hostname: workflow.cancerdb.io
   labels:
     app: argo-ui-ingress
 spec:
@@ -23,5 +25,13 @@ spec:
       paths:
       - path: /*
         backend:
-          serviceName: "argo-ui"
-          servicePort: 80
+          serviceName: ssl-redirect
+          servicePort: use-annotation
+      - path: /
+        backend:
+          serviceName: "argo-server"
+          servicePort: 2746
+      - path: /*
+        backend:
+          serviceName: "argo-server"
+          servicePort: 2746

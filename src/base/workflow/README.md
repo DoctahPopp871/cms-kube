@@ -1,4 +1,16 @@
 <https://github.com/rook/rook/blob/master/Documentation/ceph-examples.md><br>
+
+### Argo
+k create -f namespace.yaml
+k create -n argo -f install.yaml
+k create -f alb-rbac.yaml
+k create -f alb-ingress-controller.yaml
+k create -f external-dns.yaml
+k create -f ui-ingress.yaml
+k create -n argo -f docker_cred.yaml
+### Argo is deployed behind a private load balancer
+
+### Rook-Ceph
 k create -f common.yaml<br>
 k create -f operator.yaml<br>
 k create -f cluster.yaml<br>
