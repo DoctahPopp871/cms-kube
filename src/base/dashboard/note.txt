@@ -13,3 +13,10 @@ users=> grant rds_superuser to mcdbdiscuss;
 GRANT ROLE
 ALTER USER mcdbdiscuss CREATEDB;
 ALTER USER mcdbdiscuss VALID UNTIL 'infinity';
+
+Dev Setup ###
+#dev user (1) multiple DBs (dev1users, dev2users, dev3users)
+CREATE ROLE devuser with password 'gh72zsfG1JH4' login;
+
+#discussion user (1) multiple DBS (dev1discussion,dev2discussion, dev3discussion)
+CREATE ROLE devdiscussion with password 'nxvBdW25Ty7d12' login;

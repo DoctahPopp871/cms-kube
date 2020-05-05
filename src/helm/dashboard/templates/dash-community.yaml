@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.dashCommunityAppImage.appName }}
+  namespace: {{ .Values.app.namespace }}
+  labels:
+    app: {{ .Values.dashCommunityAppImage.appName }}
+spec:
+  ports:
+    - port: {{ .Values.app.network.webPort }}
+      protocol: TCP
+      targetPort: {{ .Values.app.network.webPort }}
+  selector:
+    app: {{ .Values.dashCommunityAppImage.appName }}
+  sessionAffinity: None
+  type: NodePort
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.dashCommunityAppImage.appName }}
+  namespace: {{ .Values.app.namespace }}
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  minReadySeconds: 60
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.dashCommunityAppImage.appName }}
+    spec:
+      imagePullSecrets:
+      - name: {{ .Values.secrets.mcdbHarborSecrets.mcdbCoreapps.credName }}
+      containers:
+      - name: {{ .Values.dashCommunityAppImage.appName }}
+        image: {{ .Values.dashCommunityAppImage.repository}}:{{ .Values.dashCommunityAppImage.tag}}
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.app.network.webPort }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.app.network.webPort }}
+        imagePullPolicy: {{ .Values.dashCommunityAppImage.pullPolicy }}
+        env:
+          - name: PORT
+            value: "80"

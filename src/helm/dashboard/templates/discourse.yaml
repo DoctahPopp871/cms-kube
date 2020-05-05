@@ -81,6 +81,8 @@ spec:
           value: {{ .Values.discourseSettings.smtp_endpoint }}
         - name: DISCOURSE_SMTP_PORT
           value: "{{ .Values.app.network.discourseMailPort }}"
+        - name: DISCOURSE_SMTP_ENABLE_START_TLS
+          value: "true"
         - name: DISCOURSE_SMTP_USER_NAME
           valueFrom:
             secretKeyRef:
@@ -106,6 +108,6 @@ spec:
       - name: resources
         hostPath:
           # directory location on host
-          path: /data/discussion
+          path: {{ .Values.discourseSettings.fsDir }}
           # this field is optional
           type: Directory

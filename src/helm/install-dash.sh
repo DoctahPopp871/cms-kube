@@ -20,3 +20,8 @@ cp $(pwd)/env-values/${1} $(pwd)/dashboard/values.yaml
 helm install --debug -n ${2} ./dashboard
 rm -rf $(pwd)/dashboard/values.yaml
 :
+
+
+######
+#Upgrade
+#helm upgrade dev1 ./dashboard -f values.yaml

@@ -134,8 +134,8 @@ secrets:
       dbUsername: bWNkYmRlbW8=
       dbPassword: WFpUOTJoR29MNg==
     sesEmailSecret:
-      sesUsername: QUtJQVJNUFRaQ1dJTkNXR1JCVlI=
-      sesPassword: Qk44a09QMHZ0TVpMd2k0Wms1aENISGRZYWJyT1ZLNU1yZTJtN3NVTlFrSHU=
+      sesUsername: QUtJQVJNUFRaQ1dJQlJZT1pFQkg=
+      sesPassword: QkJ5bVVkMHdnREpJdWhEWThSTlplYVdRWHlUYlBYM3NvSUlBOGtxL2JhVWI=
     mcdbHarborSecrets:
       mcdbBot:
         credName: mcdbot-cred

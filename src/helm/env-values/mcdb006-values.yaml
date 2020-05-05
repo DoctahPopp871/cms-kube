@@ -1,0 +1,158 @@
+# Default values for humandb.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+##### Deployment Env #####
+# View the README.md for the relevant env #
+platform:
+  local: false
+  aws: true
+
+#secrets:
+
+##### App Settings #####
+app:
+  namespace: mcdb006
+  host: zlarissa.mycancerdb.com
+  clusterName: mcdb-fndr-000
+  adminEmails:
+    email1: admin@mycancerdb.com
+    email2: apopp@mycancerdb.com
+  network:
+    vpcId: vpc-0c658b67ae6445a1b
+    awsRegion: us-east-2
+    psqlPort: 5432
+    webPort: 80
+    discourseMailPort: 587
+    redisPort: 6379
+    ubuntuWsPort: 80
+    nodeJsPort: 3001
+    albSecurityGroup: sg-024778cd815d6ec86
+    subnets:
+      pubsub1: subnet-0cfb877a4a3481457
+      pubsub2: subnet-09a63296e283aa3c5
+      pubsub3: subnet-05173c3a41b9c2a29
+  ingress:
+    name: mcdb006-alb-ingress
+    ingressClass: alb
+    sslCertArn: arn:aws:acm:us-east-2:095537403280:certificate/4470038f-8e38-4d6f-bcf8-94ae67aa0268
+
+
+##### Images ######
+
+redisImage:
+  appName: discredis
+  repository: redis
+  tag: latest
+  pullPolicy: Always
+
+dashApiImage:
+  appName: cdb-dash-auth
+  dbName: mcdb006users
+  dbHost: mcdb-fndr-000-db.cepbywupmriv.us-east-2.rds.amazonaws.com
+  repository: docker.cancerdb.io/mcdb-coreapps/hdb-dash-auth
+  tag: mcdb006
+  pullPolicy: Always
+
+dashVaultAppImage:
+  appName: cdb-vault-app
+  repository: docker.cancerdb.io/mcdb-coreapps/mcdb-vault-app
+  tag: mcdb006
+  pullPolicy: Always
+
+dashIntegrationsAppImage:
+  appName: cdb-intg-app
+  repository: docker.cancerdb.io/mcdb-coreapps/mcdb-intg-app
+  tag: f120fce
+  pullPolicy: Always
+
+dashCommunityAppImage:
+  appName: cdb-community-app
+  repository: docker.cancerdb.io/mcdb-coreapps/mcdb-community-app
+  tag: 68bfbd3
+  pullPolicy: Always
+
+discourseImage:
+  appName: discourse-web
+  repository: docker.cancerdb.io/mcdb-coreapps/discourse-db01
+  tag: sso
+  pullPolicy: Always
+
+dashFeImage:
+  appName: cdb-dash-fe
+  repository: docker.cancerdb.io/mcdb-coreapps/hdb-dash-fe
+  tag: c7b7a69
+  pullPolicy: Always
+
+#ubuntuWsImage:
+#  appName: ubuntu-ws
+#  repository: docker.cancerdb.io/mcdb-coreapps/IMAGE
+#  tag: latest
+#  pullPolicy: Always
+
+#dashDocsImage:
+#  appName: cdb-dash-docs
+#  repository: docker.cancerdb.io/mcdb-coreapps/IMAGE
+#  tag: latest
+#  pullPolicy: Always
+
+#dispgsqlImage:
+#  appName: pgsql-discourse
+#  repository: postgres
+#  tag: 9.5.8
+#  pullPolicy: Always
+
+##### Storage Settings #####
+
+storage:
+  awsController: aws-efs-hdb01
+  localController: hdb-nfs
+  localCode:
+    name: code
+    mountPath: /humandb
+  rawData:
+    name: data
+    mountPath: /resources
+    services: /resources/services
+
+##### Discourse Settings #####
+discourseSettings:
+  dbName: discussion006
+  discourseHostname: zlarissa.mycancerdb.com
+  discourseUrl: /discussion
+  ssoUrl: https://zlarissa.mycancerdb.com/auth/discourse/sso
+  ssoLogoutRedirect: https://zlarissa.mycancerdb.com/auth/discourse/sso/logout
+  fsDir: /data/006discussion
+  developerEmails:
+    email1: admin@mycancerdb.com
+    email2: apopp@mycancerdb.com
+  smtp_endpoint: email-smtp.us-east-1.amazonaws.com
+
+#### Secret Values ####
+## Once you have applied this helm chart remove your secrets!!! ##
+
+secrets:
+    chatapisecret:
+      apiKey: ZDc1N2UxMTJhYjYyNGQ1MGY4YWQ0ZGRlOWIyZGY2N2YwOGI5OTgwZmVkZDc2MDhhOTFlZGFhZGQwODdjYzYxNA==
+    discourseDbSecret:
+      dbUsername: ZGlzY3VzczAwNg== ##discuss006
+      dbPassword: QVZMaklPZGQ2MTRTOA== ##AVLjIOdd614S8
+    dashGoogleOauthSecret:
+      clientId: MTA1MTc0MjM1NTc1Ni1jdmNqbnAxY2lucG5xcW1uM3E1Mmk4dHYwZGptMGVkNC5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbQ==
+      clientSecret: Z09Zam1UVUZRNmNnY0lQVUJiT011VFJT
+    dashSsoSecret:
+      discourseSSOsecret: ZDQ2MmM4OTVhMWIxM2U1YTc2NGM2MmVhOWMzMWU2NDIzOTRlMTE1NzU1MjAxMGRmNTRiNzA1YTgwNjgzNzdiOTc0M2UxZmZmYWZlZDcyNWMwYTA1YmI1ZjY0YTBiMWQzNjYyM2Q1OWU4MzBjNjVhYWUz
+      discourseAdminUsername: TXlDYW5jZXJEQg==
+    authDbsecret:
+      dbUsername: dXNyMDA2 ##usr006
+      dbPassword: SkZSaHlpZDUxMkhjeDk= ##JFRhyid512Hcx9
+    sesEmailSecret:
+      sesUsername: QUtJQVJNUFRaQ1dJQlJZT1pFQkg=
+      sesPassword: QkJ5bVVkMHdnREpJdWhEWThSTlplYVdRWHlUYlBYM3NvSUlBOGtxL2JhVWI=
+    mcdbHarborSecrets:
+      mcdbBot:
+        credName: mcdbot-cred
+        dockerRegCred: eyJhdXRocyI6eyJodHRwczovL2RvY2tlci5jYW5jZXJkYi5pby8iOnsidXNlcm5hbWUiOiJyb2JvdCRtY2RiLWJvdHMiLCJwYXNzd29yZCI6ImV5SmhiR2NpT2lKU1V6STFOaUlzSW5SNWNDSTZJa3BYVkNKOS5leUpsZUhBaU9qRTFPREEzTlRjM05ESXNJbWxoZENJNk1UVTNPREUyTlRjME1pd2lhWE56SWpvaWFHRnlZbTl5TFhSdmEyVnVMV1JsWm1GMWJIUkpjM04xWlhJaUxDSnBaQ0k2TlN3aWNHbGtJam96TENKaFkyTmxjM01pT2x0N0lsSmxjMjkxY21ObElqb2lMM0J5YjJwbFkzUXZNeTl5WlhCdmMybDBiM0o1SWl3aVFXTjBhVzl1SWpvaWNIVnphQ0lzSWtWbVptVmpkQ0k2SWlKOVhYMC5MRVdmTzFTUk0yR0lBSExKd0YzLVVPUU1HZDJXOGJYRlIzc1JJUXk0WTBVbUI4RFJENU4yVC16NXF4OHBfRm1MT080NC1VWEVOdkRLc3Y2Z0kwX1JmVkh6MmQtaW5nSmg1UURiYWF6OU4wQU5mdEZWa25qRUJJVC1VdGJFcFVTSkFadHIzUS1DMnRYbnRIZEtzSlM4TEZINHZjYUplaGJuNDV3OHJtZjdlSzN3b28xOTBMQldjdXFUbW5FdmhzVjdEZ3N6bENwNXg4MXl2R0FfTlZJUlJwZmxxbm42WUFfM0lyakJIbXR3bzZYRzJyQWJ6Nl9KUXotdE9ka1BOTk9ybDZfaTUtQl9uc042ZS1qaHJQZTRPd3JJZFVXZ3luLXZaSzdmQm90bW1QZlg5VHpUVERRMExleG1PajMzY1ZjdUJEZV96R3JzYjBsdzQzQ0hKb0NGbTdsaDRrMFdfeVdrZW1OLVhrLWRHRU9xdU9XWE5MNjlLZ3BpeEFjUGVIakMwRlE4ODA2cldQTmpkb2ZFbmdjTDkyU2o2dnR2TnZQRG5lYmRYVEZLSWk5U1FReVNvUjh4RVdhUDdNMGpodFBWV3pzRzZkUG96eDMwUGQzUWFpY1RRZksxZHM0SENjUU14YXBucm9CZGN2M2FxWE00clRUdTBFWnROZlI4LWpqWnZuWktNaDFYcUtDc3Z5OVNnWjU3UmlENFZzUXdGcDQ1WjB4NEJUNVo1aTFtVm82UGlobDhUZ0tUU2w3WWd4NjdtS3dsYnA4cUFsWXd1SDZZcVNmMmZ1UFlUNzNpZC1kdkNMQmVqZzk5cms1MHJQLUdPS09EeVRveExESDV5Snk0VmRkOHp4b25YUElDb3lmMGxFdTVzXzFqSVFUbnJ6YThqa0N5LVEybE5KNCIsImF1dGgiOiJjbTlpYjNRa2JXTmtZaTFpYjNSek9tVjVTbWhpUjJOcFQybEtVMVY2U1RGT2FVbHpTVzVTTldORFNUWkphM0JZVmtOS09TNWxlVXBzWlVoQmFVOXFSVEZQUkVFelRsUmpNMDVFU1hOSmJXeG9aRU5KTmsxVVZUTlBSRVV5VGxSak1FMXBkMmxoV0U1NlNXcHZhV0ZIUm5sWmJUbDVURmhTZG1FeVZuVk1WMUpzV20xR01XSklVa3BqTTA0eFdsaEphVXhEU25CYVEwazJUbE4zYVdOSGJHdEphbTk2VEVOS2FGa3lUbXhqTTAxcFQyeDBOMGxzU214ak1qa3hZMjFPYkVscWIybE1NMEo1WWpKd2JGa3pVWFpOZVRsNVdsaENkbU15YkRCaU0wbzFTV2wzYVZGWFRqQmhWemwxU1dwdmFXTklWbnBoUTBselNXdFdiVnB0Vm1wa1EwazJTV2xLT1ZoWU1DNU1SVmRtVHpGVFVrMHlSMGxCU0V4S2QwWXpMVlZQVVUxSFpESlhPR0pZUmxJemMxSkpVWGswV1RCVmJVSTRSRkpFTlU0eVZDMTZOWEY0T0hCZlJtMU1UMDgwTkMxVldFVk9ka1JMYzNZMlowa3dYMUptVmtoNk1tUXRhVzVuU21nMVVVUmlZV0Y2T1U0d1FVNW1kRVpXYTI1cVJVSkpWQzFWZEdKRmNGVlRTa0ZhZEhJelVTMURNblJZYm5SSVpFdHpTbE00VEVaSU5IWmpZVXBsYUdKdU5EVjNPSEp0WmpkbFN6TjNiMjh4T1RCTVFsZGpkWEZVYlc1RmRtaHpWamRFWjNONmJFTndOWGc0TVhsMlIwRmZUbFpKVWxKd1pteHhibTQyV1VGZk0wbHlha0pJYlhSM2J6WllSekp5UVdKNk5sOUtVWG90ZEU5a2ExQk9Uazl5YkRaZmFUVXRRbDl1YzA0MlpTMXFhSEpRWlRSUGQzSkpaRlZYWjNsdUxYWmFTemRtUW05MGJXMVFabGc1VkhwVVZFUlJNRXhsZUcxUGFqTXpZMVpqZFVKRVpWOTZSM0p6WWpCc2R6UXpRMGhLYjBOR2JUZHNhRFJyTUZkZmVWZHJaVzFPTFZockxXUkhSVTl4ZFU5WFdFNU1OamxMWjNCcGVFRmpVR1ZJYWtNd1JsRTRPREEyY2xkUVRtcGtiMlpGYm1kalREa3lVMm8yZG5SMlRuWlFSRzVsWW1SWVZFWkxTV2s1VTFGUmVWTnZVamg0UlZkaFVEZE5NR3BvZEZCV1YzcHpSelprVUc5NmVETXdVR1F6VVdGcFkxUlJaa3N4WkhNMFNFTmpVVTE0WVhCdWNtOUNaR04yTTJGeFdFMDBjbFJVZFRCRlduUk9abEk0TFdwcVduWnVXa3ROYURGWWNVdERjM1o1T1ZObldqVTNVbWxFTkZaelVYZEdjRFExV2pCNE5FSlVOVm8xYVRGdFZtODJVR2xvYkRoVVowdFVVMnczV1dkNE5qZHRTM2RzWW5BNGNVRnNXWGQxU0RaWmNWTm1NbVoxVUZsVU56TnBaQzFrZGtOTVFtVnFaems1Y21zMU1ISlFMVWRQUzA5RWVWUnZlRXhFU0RWNVNuazBWbVJrT0hwNGIyNVlVRWxEYjNsbU1HeEZkVFZ6WHpGcVNWRlVibko2WVRocWEwTjVMVkV5YkU1S05BPT0ifX19
+      mcdbCoreapps:
+        credName: mcdbcoreapps-cred
+        dockerRegCred: eyJhdXRocyI6eyJodHRwczovL2RvY2tlci5jYW5jZXJkYi5pby8iOnsidXNlcm5hbWUiOiJyb2JvdCRtY2RiLWNvcmVhcHBzIiwicGFzc3dvcmQiOiJleUpoYkdjaU9pSlNVekkxTmlJc0luUjVjQ0k2SWtwWFZDSjkuZXlKbGVIQWlPakUxT1RFMU5EVTVOak1zSW1saGRDSTZNVFU0TXpjMk9UazJNeXdpYVhOeklqb2lhR0Z5WW05eUxYUnZhMlZ1TFdSbFptRjFiSFJKYzNOMVpYSWlMQ0pwWkNJNk9Dd2ljR2xrSWpveU1Dd2lZV05qWlhOeklqcGJleUpTWlhOdmRYSmpaU0k2SWk5d2NtOXFaV04wTHpJd0wzSmxjRzl6YVhSdmNua2lMQ0pCWTNScGIyNGlPaUp3ZFhOb0lpd2lSV1ptWldOMElqb2lJbjFkZlEuaHBlUVpnLTJLcmJXSzFlN1V5UVBfamZKTGhzSFJBYVM5cUZjOGJmLXp3RUdwcUcyYWlhcWM4ZWlYZWd2NE45bGMtOGJCUUxlanZWSTF4bTRLNVQzM2F1RU5adzQ3YmVCNWZwNnpNT0dKTUJkN3BFM1JPNHh5NTJCQ0pYTnl3VzdmX19YTEV6UjUybS1jTTdrNnNac0FldUxMbUp4NGpZbExMX1hWZFJXMGpFdVRIZjNwNGt2S3E0VXdmSElTRjdVaVc0NU5veUZuczZQVnBaMTFmNHdpUWRBQzdrZHFZenI4VG8zeUhMMUZ3dDhEdjFfT3piMW04ZVlycElqQkJUeWVFSzJERHlnNHZBbnBZc2ZNQ3g2NmN0Z1laT0FZdkZwQkxKY3VJdjdmSDU4MTZnMXVmLUVhc0x4ZmJPVjY3dkRvTWJ3NnBOUmJsd2xCNTNGN2Y1d1ltWVVjd0tQNGV2LVF6Y1NzSmFPVWh4cFFtTGFFeXJUeTl4RDFnLWJaeGJjNUZHQmwyX0JYVnU3cGgwaGNkbUZlb0Jzc05YVHc0Xy0zWktIUEdwWXBCajRuR29oTmxqVnFsOTVLaUlpMThvcEw2dlJlVUgyYWZoeVVtTUtMc0dZMFFwcGVaZkwxbHQxR2RkMXM0M3RkeEdJNnRqYy15Ml92WHQtcGhpNjRRTWd2QzVwbGNoV0hXaHBvR1VkWDRKeUR6QmotZW1sSmxsNnNFNUJpTjlmRENyWHZqUl9XVTllemhxSllkRUJCczFxMXhtWnM2MnNlbU5Ta0piSkhYbW5zTGpMbmRwTGxUVjd0Y3F3ZzhsQ0RtcU5DdnlWLVQ2U1JoYkkxNDVUdm5pQkV0RGJkNGNIeF8tMlhQM3VKdTREUG1YdEUwZEFqbVFvMFM0Z2hfRUFFdnciLCJhdXRoIjoiY205aWIzUWtiV05rWWkxamIzSmxZWEJ3Y3pwbGVVcG9Za2RqYVU5cFNsTlZla2t4VG1sSmMwbHVValZqUTBrMlNXdHdXRlpEU2prdVpYbEtiR1ZJUVdsUGFrVXhUMVJGTVU1RVZUVk9hazF6U1cxc2FHUkRTVFpOVkZVMFRYcGpNazlVYXpKTmVYZHBZVmhPZWtscWIybGhSMFo1V1cwNWVVeFlVblpoTWxaMVRGZFNiRnB0UmpGaVNGSktZek5PTVZwWVNXbE1RMHB3V2tOSk5rOURkMmxqUjJ4clNXcHZlVTFEZDJsWlYwNXFXbGhPZWtscWNHSmxlVXBUV2xoT2RtUllTbXBhVTBrMlNXazVkMk50T1hGYVYwNHdUSHBKZDB3elNteGpSemw2WVZoU2RtTnVhMmxNUTBwQ1dUTlNjR0l5TkdsUGFVcDNaRmhPYjBscGQybFNWMXB0V2xkT01FbHFiMmxKYmpGa1psRXVhSEJsVVZwbkxUSkxjbUpYU3pGbE4xVjVVVkJmYW1aS1RHaHpTRkpCWVZNNWNVWmpPR0ptTFhwM1JVZHdjVWN5WVdsaGNXTTRaV2xZWldkMk5FNDViR010T0dKQ1VVeGxhblpXU1RGNGJUUkxOVlF6TTJGMVJVNWFkelEzWW1WQ05XWndObnBOVDBkS1RVSmtOM0JGTTFKUE5IaDVOVEpDUTBwWVRubDNWemRtWDE5WVRFVjZValV5YlMxalRUZHJObk5hYzBGbGRVeE1iVXA0TkdwWmJFeE1YMWhXWkZKWE1HcEZkVlJJWmpOd05HdDJTM0UwVlhkbVNFbFRSamRWYVZjME5VNXZlVVp1Y3paUVZuQmFNVEZtTkhkcFVXUkJRemRyWkhGWmVuSTRWRzh6ZVVoTU1VWjNkRGhFZGpGZlQzcGlNVzA0WlZseWNFbHFRa0pVZVdWRlN6SkVSSGxuTkhaQmJuQlpjMlpOUTNnMk5tTjBaMWxhVDBGWmRrWndRa3hLWTNWSmRqZG1TRFU0TVRabk1YVm1MVVZoYzB4NFptSlBWalkzZGtSdlRXSjNObkJPVW1Kc2QyeENOVE5HTjJZMWQxbHRXVlZqZDB0UU5HVjJMVkY2WTFOelNtRlBWV2g0Y0ZGdFRHRkZlWEpVZVRsNFJERm5MV0phZUdKak5VWkhRbXd5WDBKWVZuVTNjR2d3YUdOa2JVWmxiMEp6YzA1WVZIYzBYeTB6V2t0SVVFZHdXWEJDYWpSdVIyOW9UbXhxVm5Gc09UVkxhVWxwTVRodmNFdzJkbEpsVlVneVlXWm9lVlZ0VFV0TWMwZFpNRkZ3Y0dWYVprd3hiSFF4UjJSa01YTTBNM1JrZUVkSk5uUnFZeTE1TWw5MldIUXRjR2hwTmpSUlRXZDJRelZ3YkdOb1YwaFhhSEJ2UjFWa1dEUktlVVI2UW1vdFpXMXNTbXhzTm5ORk5VSnBUamxtUkVOeVdIWnFVbDlYVlRsbGVtaHhTbGxrUlVKQ2N6RnhNWGh0V25NMk1uTmxiVTVUYTBwaVNraFliVzV6VEdwTWJtUndUR3hVVmpkMFkzRjNaemhzUTBSdGNVNURkbmxXTFZRMlUxSm9Za2t4TkRWVWRtNXBRa1YwUkdKa05HTkllRjh0TWxoUU0zVktkVFJFVUcxWWRFVXdaRUZxYlZGdk1GTTBaMmhmUlVGRmRuYz0ifX19
