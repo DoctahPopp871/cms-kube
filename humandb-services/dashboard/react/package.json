@@ -16,7 +16,7 @@
     "bluebird": "^3.5.1",
     "chalk": "1.1.3",
     "classnames": "^2.2.5",
-    "express": "^4.16.2",
+    "express": "^4.17.3",
     "feathers-redux": "^1.1.0",
     "feathers-reduxify-authentication": "^1.0.1",
     "history": "^4.7.2",
